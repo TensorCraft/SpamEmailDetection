@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Email Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 600px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .input-group textarea:focus {
+            outline: none;
+        }
+
+        textarea {
+            width: calc(100% - 20px);
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Spam Email Detector</h1>
+        <div class="input-group">
+            <textarea id="emailInput" placeholder="Enter your email here..."></textarea>
+        </div>
+        <button id="checkButton">Check for Spam</button>
+        <div id="result" class="result"></div>
+        <div id="loading" class="loading">Checking...</div>
+    </div>
+    <script>
+        document.getElementById('checkButton').addEventListener('click', async () => {
+            const emailInput = document.getElementById('emailInput').value;
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+
+            resultDiv.textContent = '';
+            loadingDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/check-spam', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: emailInput })
+                });
+
+                const data = await response.json();
+                loadingDiv.style.display = 'none';
+                if (data.isSpam) {
+                    resultDiv.textContent = 'This email is spam.';
+                    resultDiv.style.color = 'red';
+                } else {
+                    resultDiv.textContent = 'This email is not spam.';
+                    resultDiv.style.color = 'green';
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                resultDiv.textContent = 'Error checking the email.';
+                resultDiv.style.color = 'red';
+            }
+        });
+
+    </script>
+</body>
+
+</html>
